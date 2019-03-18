@@ -212,6 +212,9 @@ class GUIElement
         uint16_t Width;
         uint16_t Height;
         virtual void Run(TS_Point* clickPoint) = 0;
+
+    protected:
+        void fillArc(uint16_t x, uint16_t y, uint16_t start_angle, uint16_t end_angle, uint16_t radiusX, uint16_t radiusY, uint16_t width, uint16_t colour);
 };
 
 class GUIImage: public GUIElement
@@ -230,11 +233,12 @@ class GUIImage: public GUIElement
 class GUIGauge: public GUIElement
 {
     public:
-        GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Radius, uint16_t DegreesStart, uint16_t DegreesStop, uint16_t BackgroundColor, uint16_t ForegroundColor, uint16_t MinValue, uint16_t MaxValue, uint16_t Value, bool IsTransparent);
+        GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Radius, uint16_t DegreesStart, uint16_t DegreesStop, bool DrawCompleteCircle, uint16_t BackgroundColor, uint16_t ForegroundColor, uint16_t MinValue, uint16_t MaxValue, uint16_t Value, bool IsTransparent);
         ~GUIGauge() {};
         uint16_t Radius;
         uint16_t DegreesStart;
         uint16_t DegreesStop;
+        bool DrawCompleteCircle;
         uint16_t BackgroundColor = 0b0000000000011111;  
         uint16_t ForegroundColor = 0b1111111111111111; 
         uint16_t MinValue = 0;

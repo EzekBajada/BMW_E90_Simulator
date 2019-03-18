@@ -10,8 +10,8 @@ bool Car::Init()
     ClutchPressed = false; 
     Brake = 0;   
     KMH = 20;
-    Fuel = 30;
- //   if (!this->transmitter->Init()) return false;       
+    Fuel = 51;
+    if (!this->transmitter->Init()) return false;       
     
     CAS = new ECUCAS(this, transmitter);
     DME = new ECUDME(this, transmitter);

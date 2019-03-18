@@ -48,7 +48,7 @@ void GUIImage::Run(TS_Point* clickPoint)
 
 // GUIGauge --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-GUIGauge::GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Radius, uint16_t DegreesStart, uint16_t DegreesStop, uint16_t BackgroundColor, uint16_t ForegroundColor, uint16_t MinValue, uint16_t MaxValue, uint16_t Value, bool IsTransparent)
+GUIGauge::GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Radius, uint16_t DegreesStart, uint16_t DegreesStop, bool DrawCompleteCircle, uint16_t BackgroundColor, uint16_t ForegroundColor, uint16_t MinValue, uint16_t MaxValue, uint16_t Value, bool IsTransparent)
     :GUIElement(tft, touch, X, Y, Radius * 2, Radius * 2)
 {
     this->Radius = Radius;
@@ -60,6 +60,7 @@ GUIGauge::GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X
     this->MaxValue = MaxValue;
     this->Value = Value;
     this->IsTransparent = IsTransparent;
+    this->DrawCompleteCircle = DrawCompleteCircle;
 }
 
 void GUIGauge::Run(TS_Point* clickPoint)
@@ -98,8 +99,14 @@ void GUIGauge::Run(TS_Point* clickPoint)
     {
         uint16_t centerX = this->X + this->Radius;
         uint16_t centerY = this->Y + this->Radius;
-        if (!this->IsTransparent) this->tft->fillCircle(centerX, centerY, this->Radius, this->BackgroundColor);       
-        float angle = this->Value / (float) (this->MaxValue - this->MinValue); //map(this->Value, this->MinValue, this->MaxValue, (float) this->DegreesStart / (2 * PI), (float) this->DegreesStop / (2 * PI));
+        if (!this->IsTransparent)
+        {
+            if (this->DrawCompleteCircle)
+                this->tft->fillCircle(centerX, centerY, this->Radius, this->BackgroundColor);       
+            else
+                fillArc(centerX, centerY, this->DegreesStart + 90, this->DegreesStop + 90, this->Radius, this->Radius, this->Radius, this->BackgroundColor);
+        }
+        float angle = this->Value / (float) (this->MaxValue - this->MinValue);
         angle = ((this->DegreesStop - this->DegreesStart) * angle) + this->DegreesStart;       
         angle = angle * PI / 180;
         uint16_t x = centerX + ((this->Radius - 3) * cos(angle));
@@ -232,4 +239,43 @@ void GUI::drawScreen()
 { 
     tft->fillScreen(ILI9341_BLACK);
     // Draw your screen controls here
+}
+
+// ------------------------------------------------------------------------ GRAPHICS ROUTINES ------------------------------------------------------------------
+
+void GUIElement::fillArc(uint16_t x, uint16_t y, uint16_t start_angle, uint16_t end_angle, uint16_t radiusX, uint16_t radiusY, uint16_t width, uint16_t colour)
+{
+    #define DEG2RAD 0.0174532925
+    uint8_t seg = 3; // Segments are 3 degrees wide = 120 segments for 360 degrees
+    uint8_t inc = 3; // Draw segments every 3 degrees, increase to 6 for segmented ring
+    uint16_t seg_count = (end_angle - start_angle) / 3;
+
+    // Calculate first pair of coordinates for segment start
+    float sx = cos((start_angle - 90) * DEG2RAD);
+    float sy = sin((start_angle - 90) * DEG2RAD);
+    uint16_t x0 = sx * (radiusX - width) + x;
+    uint16_t y0 = sy * (radiusY - width) + y;
+    uint16_t x1 = sx * radiusX + x;
+    uint16_t y1 = sy * radiusY + y;
+
+  // Draw colour blocks every inc degrees
+  for (uint16_t i = start_angle; i < start_angle + seg * seg_count; i += inc) {
+
+    // Calculate pair of coordinates for segment end
+    float sx2 = cos((i + seg - 90) * DEG2RAD);
+    float sy2 = sin((i + seg - 90) * DEG2RAD);
+    uint16_t x2 = sx2 * (radiusX - width) + x;
+    uint16_t y2 = sy2 * (radiusY - width) + y;
+    uint16_t x3 = sx2 * radiusX + x;
+    uint16_t y3 = sy2 * radiusY + y;
+
+    this->tft->fillTriangle(x0, y0, x1, y1, x2, y2, colour);
+    this->tft->fillTriangle(x1, y1, x2, y2, x3, y3, colour);
+
+    // Copy segment end to sgement start for next segment
+    x0 = x2;
+    y0 = y2;
+    x1 = x3;
+    y1 = y3;
+  }
 }

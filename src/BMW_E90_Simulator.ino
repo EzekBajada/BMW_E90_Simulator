@@ -22,8 +22,8 @@ extern "C"
 Car car;
 GUI gui(&car);
 GUIImage dash(gui.GetTFT(), gui.GetTS(), 0, 0, 320, 134, E90DashImage, E90DashImageLength);
-GUIGauge speedometer(gui.GetTFT(), gui.GetTS(), 32, 24, 40, 140, 400, 0b0000000000000000, 0b1111111111111111, 0, 260, 0, false);
-GUIGauge revCounter(gui.GetTFT(), gui.GetTS(), 214, 26, 40, 140, 400, 0b0000000000000000, 0b1111111111111111, 0, 70, 0, false);
+GUIGauge speedometer(gui.GetTFT(), gui.GetTS(), 32, 24, 40, 140, 400, true, 0b0000000000000000, 0b1111111111111111, 0, 260, 0, false);
+GUIGauge revCounter(gui.GetTFT(), gui.GetTS(), 214, 26, 40, 140, 400, true, 0b0000000000000000, 0b1111111111111111, 0, 70, 0, false);
 
 
 void setup() 
@@ -39,18 +39,21 @@ void setup()
     {
         Serial.println("Failed!");
         while(true) yield();
-    }   
+    }       
     Serial.println("OK");  
     gui.RegisterElement(&dash);    
     gui.RegisterElement(&speedometer);    
     gui.RegisterElement(&revCounter);    
 }
 
+
+
+
 void loop() 
 {
     gui.Run();
     car.KMH = speedometer.Value;
-    car.DME->RPM = revCounter.Value;
+    car.DME->RPM = revCounter.Value * 100;
     car.Run();      
     yield();
 }
