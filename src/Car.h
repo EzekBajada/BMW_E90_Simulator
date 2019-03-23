@@ -227,6 +227,7 @@ class GUIImage: public GUIElement
         void Run(TS_Point* clickPoint);
 
     private:
+        TS_Point* clickStartPoint = NULL;
         bool needsRedrawing = true;
 };
 

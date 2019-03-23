@@ -30,7 +30,7 @@ void GUIImage::Run(TS_Point* clickPoint)
             for(uint16_t x = 0; x < this->Width; x++)
             {
                 uint16_t color = pgm_read_byte(this->Image + pos++) << 8 | pgm_read_byte(this->Image + pos++);
-                tft->drawPixel(x, y, color);
+                tft->drawPixel((X+x), (Y+y), color);
             }
       /*
         uint16_t centerX = this->X + this->Radius;
@@ -43,6 +43,12 @@ void GUIImage::Run(TS_Point* clickPoint)
         uint16_t y = centerY + ((this->Radius - 3) * sin(angle));
         this->tft->drawLine(centerX, centerY, x, y, this->ForegroundColor);*/
         this->needsRedrawing = false;
+    }
+    if (clickPoint != NULL)
+    {
+        //Inside the image
+    }
+    else {
     }
 }
 
@@ -65,6 +71,7 @@ GUIGauge::GUIGauge(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X
 
 void GUIGauge::Run(TS_Point* clickPoint)
 {
+    
     if (clickPoint != NULL)
     { // Handle Click
       //  Serial.println("Touch Gauge at " + String(clickPoint->x) + ", " + String(clickPoint->y) + ", Pressure " + String(clickPoint->z));
@@ -231,6 +238,7 @@ void GUI::Run()
             elementPoint->z = point->z;
         }
         this->elements[i]->Run(elementPoint);
+        Serial.print(elements[i]->X);
         if (elementPoint) delete elementPoint;
     }
 }
