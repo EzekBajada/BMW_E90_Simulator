@@ -220,15 +220,18 @@ class GUIElement
 class GUIImage: public GUIElement
 {
     public:
-        GUIImage(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, const uint8_t* Image, uint16_t ImageLength);
+        GUIImage(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, const uint8_t* Image, uint16_t ImageLength, void (*ClickHandler)(uint8_t imageCode), uint8_t callBackCode);
         ~GUIImage() {};
         const uint8_t* Image;
         uint16_t ImageLength;
-        void Run(TS_Point* clickPoint);
+        void Run(TS_Point* clickPoint);        
 
     private:
         TS_Point* clickStartPoint = NULL;
         bool needsRedrawing = true;
+        void (*ClickHandler)(uint8_t imageCode);
+        uint8_t callBackCode = 0;
+        bool clickInProgress = false;
 };
 
 class GUIGauge: public GUIElement

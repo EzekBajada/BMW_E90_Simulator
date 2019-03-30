@@ -14,15 +14,37 @@ GUIElement::GUIElement(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16
 }
 
 // GUIImage --------------------------------------------------------------------------------------------------------------------------------------------------------
-GUIImage::GUIImage(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, const uint8_t* Image, uint16_t ImageLength)
+GUIImage::GUIImage(Adafruit_ILI9341* tft, XPT2046_Touchscreen* touch, uint16_t X, uint16_t Y, uint16_t Width, uint16_t Height, const uint8_t* Image, uint16_t ImageLength, void (*ClickHandler)(uint8_t imageCode), uint8_t callBackCode)
     :GUIElement(tft, touch, X, Y, Width, Height)
 {
     this->Image = Image;
     this->ImageLength = ImageLength;
+    this->ClickHandler = ClickHandler;
+    this->callBackCode = callBackCode;
 }
 
 void GUIImage::Run(TS_Point* clickPoint)
 {
+    if (this->ClickHandler != NULL)
+        {
+        if (clickPoint == NULL)
+        {
+            if (this->clickInProgress) 
+            {
+                this->clickInProgress = false;
+                this->needsRedrawing = true;
+            }
+        }
+        else
+        {   
+            if (!this->clickInProgress)
+            {     
+                this->ClickHandler(this->callBackCode);
+                this->clickInProgress = true;
+                this->needsRedrawing = true;
+            }        
+        }
+    }
     if (this->needsRedrawing)
     {
         uint32_t pos = 0;
@@ -30,25 +52,9 @@ void GUIImage::Run(TS_Point* clickPoint)
             for(uint16_t x = 0; x < this->Width; x++)
             {
                 uint16_t color = pgm_read_byte(this->Image + pos++) << 8 | pgm_read_byte(this->Image + pos++);
-                tft->drawPixel((X+x), (Y+y), color);
+                tft->drawPixel((X+x), (Y+y), color); // RGB 565 for grayscale average all 3
             }
-      /*
-        uint16_t centerX = this->X + this->Radius;
-        uint16_t centerY = this->Y + this->Radius;
-        if (!this->IsTransparent) this->tft->fillCircle(centerX, centerY, this->Radius, this->BackgroundColor);       
-        float angle = this->Value / (float) (this->MaxValue - this->MinValue); //map(this->Value, this->MinValue, this->MaxValue, (float) this->DegreesStart / (2 * PI), (float) this->DegreesStop / (2 * PI));
-        angle = ((this->DegreesStop - this->DegreesStart) * angle) + this->DegreesStart;       
-        angle = angle * PI / 180;
-        uint16_t x = centerX + ((this->Radius - 3) * cos(angle));
-        uint16_t y = centerY + ((this->Radius - 3) * sin(angle));
-        this->tft->drawLine(centerX, centerY, x, y, this->ForegroundColor);*/
         this->needsRedrawing = false;
-    }
-    if (clickPoint != NULL)
-    {
-        //Inside the image
-    }
-    else {
     }
 }
 
@@ -237,8 +243,7 @@ void GUI::Run()
             elementPoint->y = point->y - this->elements[i]->Y;
             elementPoint->z = point->z;
         }
-        this->elements[i]->Run(elementPoint);
-        Serial.print(elements[i]->X);
+        this->elements[i]->Run(elementPoint);        
         if (elementPoint) delete elementPoint;
     }
 }
