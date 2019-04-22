@@ -42,19 +42,35 @@ void GUIImage::Run(TS_Point* clickPoint)
                 this->ClickHandler(this->callBackCode);
                 this->clickInProgress = true;
                 this->needsRedrawing = true;
+                this->imageClicked = !this->imageClicked;
             }        
         }
     }
+    
     if (this->needsRedrawing)
     {
+        if(!this->imageClicked) 
+        {
         uint32_t pos = 0;
         for(uint16_t y = 0; y < this->Height; y++)
             for(uint16_t x = 0; x < this->Width; x++)
             {
                 uint16_t color = pgm_read_byte(this->Image + pos++) << 8 | pgm_read_byte(this->Image + pos++);
-                tft->drawPixel((X+x), (Y+y), color); // RGB 565 for grayscale average all 3
+                tft->drawPixel((X+x), (Y+y), color); 
             }
         this->needsRedrawing = false;
+        } else
+        {
+        uint32_t pos = 0;
+        for(uint16_t y = 0; y < this->Height; y++)
+            for(uint16_t x = 0; x < this->Width; x++)
+            {
+                uint16_t color = pgm_read_byte(this->Image + pos++) << 8 | pgm_read_byte(this->Image + pos++);
+                uint16_t grayscale = TurnToGrayScale(color);
+                tft->drawPixel((X+x), (Y+y), grayscale); 
+            }
+        this->needsRedrawing = false;
+        }
     }
 }
 
@@ -92,7 +108,7 @@ void GUIGauge::Run(TS_Point* clickPoint)
         else
         { // Click continuing
             if (millis() - this->lastMovement >= this->MovementSpeed)
-            {
+            {   
                 if (clickPoint->y < this->clickStartPoint->y - 10 && this->Value < this->MaxValue) { this->Value++; this->needsRedrawing = true; }
                 if (clickPoint->y > this->clickStartPoint->y + 10 && this->Value > this->MinValue) { this->Value--; this->needsRedrawing = true; }                
                 this->lastMovement = millis(); 
@@ -291,4 +307,13 @@ void GUIElement::fillArc(uint16_t x, uint16_t y, uint16_t start_angle, uint16_t 
     x1 = x3;
     y1 = y3;
   }
+}
+
+uint16_t GUIElement::TurnToGrayScale(uint16_t color)
+{
+   uint32_t sum = ((color & 0b1111100000000000) >> 11) * 255 / 31;
+   sum += ((color & 0b0000011111100000) >> 5) * 255 / 63;
+   sum += (color & 0b0000000000011111) * 255 / 31;    
+   sum /= 3;  
+   return ((sum & 0xF8) << 8) | ((sum & 0xFC) << 3) | (sum >> 3);
 }

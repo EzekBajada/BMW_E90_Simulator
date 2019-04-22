@@ -215,6 +215,7 @@ class GUIElement
 
     protected:
         void fillArc(uint16_t x, uint16_t y, uint16_t start_angle, uint16_t end_angle, uint16_t radiusX, uint16_t radiusY, uint16_t width, uint16_t colour);
+        uint16_t TurnToGrayScale(uint16_t color);
 };
 
 class GUIImage: public GUIElement
@@ -232,6 +233,7 @@ class GUIImage: public GUIElement
         void (*ClickHandler)(uint8_t imageCode);
         uint8_t callBackCode = 0;
         bool clickInProgress = false;
+        bool imageClicked = false;
 };
 
 class GUIGauge: public GUIElement

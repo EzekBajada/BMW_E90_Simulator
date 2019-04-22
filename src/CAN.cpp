@@ -16,6 +16,7 @@ bool CAN::Init()
     while (CAN_OK != this->interface->begin(this->Speed)) 
     {
         delay(100);
+        Serial.print("Can failed to return a value");
         if (timeout < millis()) return false;
     }
     this->initialised = true;
