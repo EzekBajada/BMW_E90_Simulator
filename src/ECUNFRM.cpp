@@ -4,7 +4,7 @@ ECUNFRM::ECUNFRM(Car* car, CAN* transmitter):ECU(car, transmitter)
 {
     MessageTimer21A = 26;
     
-    BrakeLight = false;
+    BrakeLight = true;
     SideLight = true;
     DippedBeam = true;
     MainBeam = true;

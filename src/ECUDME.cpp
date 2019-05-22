@@ -27,7 +27,7 @@ ECUDME::~ECUDME()
 //KOMBI Speed
 void ECUDME::SendMessage1A6() 
 {    
-    uint16_t KMH_A = ((((millis() - MessageTimer1A6) / 50) * this->car->KMH)) / 3;  //Division by 3 added by Robert
+    uint16_t KMH_A = ((((millis() - MessageTimer1A6) / 50) * this->car->KMH)) / 3; 
     uint16_t KMH_2A = KMH_A + lastKMH;
     lastKMH = KMH_2A;  
     CANMessage* message = new CANMessage(0x1A6, 8);       

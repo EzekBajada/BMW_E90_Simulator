@@ -7,8 +7,8 @@ ECUAirbag::ECUAirbag(Car* car, CAN* transmitter):ECU(car, transmitter)
     Counter0D7 = 0;
     MessageTimer581 = 14;
 
-    bool SeatBeltOn = true;
-    bool HandBrakeOn = true;
+    bool SeatBeltOn = false;
+    bool HandBrakeOn = false;
 }
 
 ECUAirbag::~ECUAirbag()

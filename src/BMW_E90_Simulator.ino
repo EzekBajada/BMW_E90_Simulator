@@ -21,19 +21,20 @@ extern "C"
 
 Car car;
 GUI gui(&car);
-
+ECUDME dme(&car, car.GetTransmitter());
 void ClickHandler(uint8_t imageCode)
 {
     Serial.println("IMAGE CLICK " + String(imageCode));
     switch(imageCode)
     {
-        case 2: // ABS Image
-        case 3: // Trac Image
-        case 4: break; 
-        // car.Airbag->SeatBeltOn = !car.Airbag->SeatBeltOn; break;            
-        case 5: // Steering Image
+        case 2: dme.SendMessage592(0x2A);break;
+        case 3: dme.SendMessage592(0x01);break;
+        case 4: dme.SendMessage592(0x4D);break;          
+        case 5: dme.SendMessage592(0x49);break;
+        case 8: dme.SendMessage592(0x37);break;  
         case 7: car.NFRM->MainBeam = !car.NFRM->MainBeam; break;
-        
+        case 6: dme.SendMessage592(0x61);break;  
+        case 9: dme.SendMessage592(0x3F);break;  
     }
 }
 

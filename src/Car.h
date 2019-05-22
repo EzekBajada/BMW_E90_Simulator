@@ -54,7 +54,7 @@ class Car
     ECUAirbag* Airbag;
     ECUOthers* Others;
 
-    
+    CAN* GetTransmitter() {return this->transmitter; };
     private:
     CAN* transmitter;
   
@@ -126,6 +126,7 @@ class ECUDME:public ECU
         void SendMessage349();
         void SendMessage3B4();
         void SendMessage592(uint8_t errorCode);
+        
         
     private:  
         uint64_t MessageTimer0AA;
