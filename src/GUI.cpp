@@ -151,7 +151,7 @@ GUI::GUI(Car* car)
 {    
     this->car = car;
     this->page = 'S';
-    this->tft = new Adafruit_ILI9341(D8, D0);
+    this->tft = new Adafruit_ILI9341(D3, D0);
     this->tft->begin();
     this->tft->setRotation(1);
     this->touch = new XPT2046_Touchscreen(D2, D1);
@@ -160,6 +160,7 @@ GUI::GUI(Car* car)
     this->drawScreen(); 
     EEPROM.begin(4096);
     uint16_t pos = 0;
+    // Change AB AND CD to any random to calibrate
     if (EEPROM.read(pos++) == 0xAB && EEPROM.read(pos++) == 0xCD)
     {
         vi1 = (EEPROM.read(pos++) << 8) | EEPROM.read(pos++);

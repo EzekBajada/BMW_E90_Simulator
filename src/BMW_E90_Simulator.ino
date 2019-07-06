@@ -15,9 +15,14 @@ extern "C"
  * D5   SCK   SCK
  * D6   MISO  MISO
  * D7   MOSI  MOSI
- * D8         CS
+ * D3         CS
  */
 
+ 
+/* Yellow Shrink Tube = SCK
+   Blue Shrink Tube = MISO / SO
+   Green Shrink Tube = MOSI / SI
+ */
 
 Car car;
 GUI gui(&car);
@@ -57,7 +62,7 @@ void setup()
     system_update_cpu_freq(160);    
     Serial.begin(115200);
     Serial.println();
-    Serial.println();
+    Serial.println();       
     Serial.println("BMW E90 Simulator");   
     Serial.println();    
     Serial.print("Initialising Car...");
@@ -67,6 +72,7 @@ void setup()
         while(true) yield();
     }       
     Serial.println("OK");  
+    
     gui.RegisterElement(&dash);    
     gui.RegisterElement(&speedometer);    
     gui.RegisterElement(&revCounter);    
